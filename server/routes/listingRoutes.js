@@ -2,9 +2,11 @@ import { Router } from "express";
 import {
     createListing,
     deleteListing,
+    findAllChatsForListing,
     findAllListings,
     findListingById,
     findListingsBySeller,
+    findOrCreateChatForListing,
     updateListing
 } from "../models/listings.js";
 import { sellerAuth } from "./auth.js";
@@ -93,6 +95,31 @@ router.delete("/:listingId", sellerAuth, verifySellerOwnedListing, async (req, r
     try {
         const result = await deleteListing(listingId);
         res.send(result);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+// GET /api/listings/:listingId/chats (Seller View)
+router.get("/:listingId/chats", sellerAuth, verifySellerOwnedListing, async (req, res) => {
+    const { listingId } = req.params;
+    try {
+        const chats = await findAllChatsForListing(listingId);
+        res.send(chats);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+// POST /api/listings/:listingId/chats (Buyer initiates chat)
+router.post("/:listingId/chats", buyerAuth, async (req, res) => {
+    const { listingId } = req.params;
+    const buyerId = req.buyer && req.buyer._id;
+    try {
+        const chat = await findOrCreateChatForListing(listingId, buyerId);
+        res.send(chat);
     } catch (error) {
         console.error(error);
         res.sendStatus(500);
