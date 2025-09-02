@@ -1,5 +1,4 @@
-# c14-project3-starter
-Examples MERN Stack for project 3
+# Gatherly 
 
 ## Development
 To run this app you will need two terminal windows, one for the server and one for the client.
